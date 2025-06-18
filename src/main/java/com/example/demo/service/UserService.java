@@ -6,10 +6,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.User;
+import com.example.demo.model.UserUpdateRequest;
 import com.example.demo.repositories.UserRepository;
 
 @Service
 public class UserService {
+
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -34,14 +36,13 @@ public class UserService {
         throw new RuntimeException("User not found with id " + userId);
     }
 
-    public User updateUser(Long userId, User userDetails) {
+    public User updateUser(Long userId, UserUpdateRequest userDetails) {
         Optional<User> existingUser = userRepository.findById(userId);
         if (existingUser.isPresent()) {
-          User user = existingUser.get();
-          user.setFirstName(userDetails.getFirstName());
-          user.setLastName(userDetails.getLastName());
-          user.setEmail(userDetails.getEmail());
-          return userRepository.save(user);
+            User user = existingUser.get();
+            user.setFirstName(userDetails.getFirstName());
+            user.setLastName(userDetails.getLastName());
+            return userRepository.save(user);
         }
         throw new RuntimeException("User not found with id: " + userId);
     }

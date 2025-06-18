@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.User;
 import com.example.demo.model.UserDetailRequestModel;
+import com.example.demo.model.UserUpdateRequest;
 import com.example.demo.service.UserService;
 
 import jakarta.validation.Valid;
@@ -22,6 +23,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/users") // This will map to /users
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -49,17 +51,23 @@ public class UserController {
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
         user.setEmail(userDetails.getEmail());
-        
+
         return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
     }
 
-    @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody User userDetails) {
-        return new ResponseEntity<>(userService.updateUser(userDetails.getUserId(), userDetails) ,HttpStatus.OK);
+    @PutMapping(
+            path = "/{userId}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    )
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @Valid @RequestBody UserUpdateRequest userUpdate) {
+
+        return new ResponseEntity<>(userService.updateUser(userId, userUpdate), HttpStatus.OK);
     }
 
-    @DeleteMapping
-    public String deleteUser() {
-        return "User deleted";
+    @DeleteMapping(path = "/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
