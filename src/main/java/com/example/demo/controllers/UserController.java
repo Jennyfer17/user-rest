@@ -1,5 +1,7 @@
 package com.example.demo.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +19,14 @@ import com.example.demo.model.User;
 import com.example.demo.model.UserDetailRequestModel;
 import com.example.demo.model.UserUpdateRequest;
 import com.example.demo.service.UserService;
+import com.example.demo.service.UserServiceException;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users") // This will map to /users
 public class UserController {
-
+    
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -31,13 +34,13 @@ public class UserController {
     }
 
     @GetMapping
-    public String getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
+    public List<User> getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "limit", defaultValue = "50") int limit, @RequestParam(value = "sort", required = false) String sort) {
-        return "Users details from page " + page + " with limit " + limit + (sort != null ? " sorted by " + sort : "");
+        return userService.getAllUsers();
     }
 
     @GetMapping(path = "/{userId}", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<User> getUser(@PathVariable Long userId) {
+    public ResponseEntity<User> getUser(@PathVariable Long userId) throws UserServiceException {
         User user = userService.getUserBydId(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
